@@ -1,11 +1,11 @@
+import os
 import asyncio
 import logging
-import os
+from aiohttp import web
 from aiogram import Bot, Dispatcher
 from aiogram.client.session.aiohttp import AiohttpSession 
 from database.db_handler import init_db
 from handlers import client, admin
-from aiohttp import web
 
 logging.basicConfig(level=logging.INFO)
 
@@ -20,10 +20,13 @@ async def main():
     BOT_TOKEN = os.environ.get('BOT_TOKEN')
     
     if not BOT_TOKEN:
-        from config import BOT_TOKEN as LOCAL_TOKEN
-        BOT_TOKEN = LOCAL_TOKEN
+        try:
+            from config import BOT_TOKEN as LOCAL_TOKEN
+            BOT_TOKEN = LOCAL_TOKEN
+        except ImportError:
+            print("❌ ОШИБКА: Токен бота не найден в Environment Variables и файл config.py отсутствует!")
+            return
 
-    if IS_PA_SERVER:
         print("🌐 Запуск на сервері PythonAnywhere (через проксі)...")
         session = AiohttpSession(proxy="http://proxy.server:3128")
         bot = Bot(token=BOT_TOKEN, session=session)
