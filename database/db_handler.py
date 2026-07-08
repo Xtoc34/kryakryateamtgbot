@@ -1,6 +1,8 @@
 import sqlite3
 from datetime import datetime
-from config import DB_NAME
+import os
+
+DB_NAME = os.environ.get('DB_NAME', 'db.sqlite3')
 
 def init_db():
     """Ініціалізація бази даних та створення таблиць"""
