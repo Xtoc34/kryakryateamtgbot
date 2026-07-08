@@ -1,4 +1,3 @@
-# handlers/client.py
 import logging
 from aiogram import Router, F, Bot
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, BotCommand
@@ -17,10 +16,6 @@ router = Router()
 class SupportStates(StatesGroup):
     waiting_for_message = State()
 
-
-# =====================================================================
-# 🛡️ ЗАХИСТ ВІД СПАМУ ТА УМОВНА АПЕЛЯЦІЯ (ВЕРХНІЙ ХЕНДЛЕР)
-# =====================================================================
 @router.message(lambda message: db.is_banned(message.from_user.id))
 async def handle_banned_user_everywhere(message: Message, state: FSMContext):
     await state.clear()
@@ -46,7 +41,7 @@ async def handle_banned_user_everywhere(message: Message, state: FSMContext):
 
     banned_at = datetime.strptime(ban_info["banned_at"], "%Y-%m-%d %H:%M:%S")
     time_passed = datetime.now() - banned_at
-    cooldown_time = timedelta(minets=10)
+    cooldown_time = timedelta(minutes=10)
 
     if time_passed < cooldown_time:
         seconds_left = int((cooldown_time - time_passed).total_seconds())
@@ -65,7 +60,6 @@ async def handle_banned_user_everywhere(message: Message, state: FSMContext):
             [InlineKeyboardButton(text=btn_text, callback_data=f"user_send_appeal:{user_id}")]
         ])
         await message.answer(text, reply_markup=kb)
-
 
 def get_lang_keyboard():
     return InlineKeyboardMarkup(inline_keyboard=[
@@ -94,7 +88,6 @@ def get_cancel_keyboard(lang: str):
         [InlineKeyboardButton(text=text, callback_data="back_to_menu")]
     ])
 
-
 async def create_new_support_topic(bot: Bot, user_id: int, full_name: str, mention_html: str, lang: str):
     new_topic = await bot.create_forum_topic(chat_id=ADMIN_GROUP_ID, name=f"{full_name} ({user_id})")
     db.set_topic(user_id, new_topic.message_thread_id)
@@ -108,7 +101,6 @@ async def create_new_support_topic(bot: Bot, user_id: int, full_name: str, menti
     )
     await bot.send_message(chat_id=ADMIN_GROUP_ID, text=info_text, message_thread_id=new_topic.message_thread_id, parse_mode="HTML")
     return new_topic.message_thread_id
-
 
 @router.message(CommandStart())
 async def cmd_start(message: Message, state: FSMContext, bot: Bot):
@@ -138,7 +130,6 @@ async def cmd_start(message: Message, state: FSMContext, bot: Bot):
     else:
         await message.answer(TEXTS["uk"]["welcome"], reply_markup=get_lang_keyboard())
 
-
 @router.message(Command("help"))
 async def cmd_help(message: Message, state: FSMContext):
     await state.clear()
@@ -150,7 +141,6 @@ async def cmd_help(message: Message, state: FSMContext):
 
     await message.answer(TEXTS[lang]["faq_text"], reply_markup=get_main_menu(lang), parse_mode="Markdown")
 
-
 @router.callback_query(F.data.startswith("set_lang_"))
 async def callback_select_lang(callback: CallbackQuery):
     lang = callback.data.split("_")[2]
@@ -159,7 +149,6 @@ async def callback_select_lang(callback: CallbackQuery):
 
     await callback.message.edit_text(text=TEXTS[lang]["main_menu"], reply_markup=get_main_menu(lang), parse_mode="Markdown")
     await callback.answer()
-
 
 @router.callback_query(F.data == "open_faq")
 async def callback_faq(callback: CallbackQuery):
@@ -171,7 +160,6 @@ async def callback_faq(callback: CallbackQuery):
         pass
     await callback.answer()
 
-
 @router.callback_query(F.data == "back_to_menu")
 async def callback_back(callback: CallbackQuery, state: FSMContext):
     await state.clear()
@@ -179,7 +167,6 @@ async def callback_back(callback: CallbackQuery, state: FSMContext):
     lang = db.get_user_lang(user_id) or "uk"
     await callback.message.edit_text(text=TEXTS[lang]["main_menu"], reply_markup=get_main_menu(lang), parse_mode="Markdown")
     await callback.answer()
-
 
 @router.callback_query(F.data == "contact_support")
 async def callback_support(callback: CallbackQuery, state: FSMContext):
@@ -194,7 +181,6 @@ async def callback_support(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(text=TEXTS[lang]["support_activated"], reply_markup=get_cancel_keyboard(lang), parse_mode="Markdown")
     await state.set_state(SupportStates.waiting_for_message)
     await callback.answer()
-
 
 @router.message(SupportStates.waiting_for_message)
 async def forward_to_admin_group(message: Message, state: FSMContext, bot: Bot):
@@ -228,7 +214,6 @@ async def forward_to_admin_group(message: Message, state: FSMContext, bot: Bot):
         logging.error(f"Помилка пересилання: {e}")
         await message.answer("❌ Сталася помилка при надсиланні повідомлення.")
         await state.clear()
-
 
 @router.callback_query(F.data.startswith("user_send_appeal:"))
 async def callback_user_send_appeal(callback: CallbackQuery, bot: Bot):
