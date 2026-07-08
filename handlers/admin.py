@@ -3,7 +3,8 @@ import logging
 from aiogram import Router, F, Bot
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.filters import Command
-from config import ADMIN_GROUP_ID
+import os
+ADMIN_GROUP_ID = int(os.environ.get('ADMIN_GROUP_ID', 0))
 from database import db_handler as db
 from language_str import TEXTS
 
