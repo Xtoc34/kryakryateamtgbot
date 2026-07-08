@@ -9,7 +9,8 @@ from datetime import datetime, timedelta
 
 from language_str import TEXTS
 from database import db_handler as db
-from config import ADMIN_GROUP_ID
+import os
+ADMIN_GROUP_ID = int(os.environ.get('ADMIN_GROUP_ID', 0))
 
 router = Router()
 
