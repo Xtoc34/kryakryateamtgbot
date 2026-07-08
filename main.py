@@ -5,8 +5,12 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.session.aiohttp import AiohttpSession 
 from database.db_handler import init_db
 from handlers import client, admin
+from aiohttp import web
 
 logging.basicConfig(level=logging.INFO)
+
+async def handle_ping(request):
+    return web.Response(text="OK", status=200)
 
 async def main():
     init_db()
@@ -28,9 +32,18 @@ async def main():
         bot = Bot(token=BOT_TOKEN)
 
     dp = Dispatcher()
-    
     dp.include_router(admin.router)
     dp.include_router(client.router)
+
+    app = web.Application()
+    app.router.add_get('/', handle_ping)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    
+    port = int(os.environ.get("PORT", 8080))
+    site = web.TCPSite(runner, '0.0.0.0', port)
+    await site.start()
+    print(f"🌍 Веб-сервер для пинга запущен на порту {port}")
 
     print("🚀 Бот запущений через Long Polling...")
     
