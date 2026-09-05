@@ -24,7 +24,7 @@ async def main():
             from config import BOT_TOKEN as LOCAL_TOKEN
             BOT_TOKEN = LOCAL_TOKEN
         except ImportError:
-            print("❌ ОШИБКА: Токен бота не найден в Environment Variables и файл config.py отсутствует!")
+            print("❌ Помилка! Токен бота не знайдено")
             return
 
         print("🌐 Запуск на сервері PythonAnywhere (через проксі)...")
@@ -46,7 +46,7 @@ async def main():
     port = int(os.environ.get("PORT", 8080))
     site = web.TCPSite(runner, '0.0.0.0', port)
     await site.start()
-    print(f"🌍 Веб-сервер для пинга запущен на порту {port}")
+    print(f"🌍 Веб-сервер для пінгу запущен на порту {port}")
 
     print("🚀 Бот запущений через Long Polling...")
     

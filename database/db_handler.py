@@ -21,8 +21,6 @@ def init_db():
             topic_id INTEGER
         )
     ''')
-
-    # Оновлена таблиця блекліста з підтримкою кулдауну та статусів апеляції
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS blacklist (
             user_id INTEGER PRIMARY KEY,
@@ -87,10 +85,6 @@ def delete_topic(user_id):
     cursor.execute('DELETE FROM topics WHERE user_id = ?', (user_id,))
     conn.commit()
     conn.close()
-
-# =====================================================================
-# 🛡️ ОБНОВЛЕНА СИСТЕМА БАНІВ ТА АПЕЛЯЦІЙ
-# =====================================================================
 
 def is_banned(user_id):
     """Перевірити, чи забанений користувач"""

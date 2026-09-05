@@ -1,4 +1,3 @@
-# handlers/admin.py
 import logging
 from aiogram import Router, F, Bot
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
@@ -9,10 +8,6 @@ from database import db_handler as db
 from language_str import TEXTS
 
 router = Router()
-
-# =====================================================================
-# 📌 КОМАНДА /close (ЗАКРЫТИЕ ТТИКЕТА)
-# =====================================================================
 @router.message(F.chat.id == ADMIN_GROUP_ID, Command("close"))
 async def cmd_close_ticket(message: Message, bot: Bot):
     if not message.message_thread_id:
@@ -35,9 +30,6 @@ async def cmd_close_ticket(message: Message, bot: Bot):
         await message.answer("Користувача для цього топіка не знайдено.")
 
 
-# =====================================================================
-# 🚫 КОМАНДА /ban (БЛОКИРОВКА ПОЛЬЗОВАТЕЛЯ)
-# =====================================================================
 @router.message(F.chat.id == ADMIN_GROUP_ID, Command("ban"))
 async def cmd_ban_user(message: Message, bot: Bot):
     if not message.message_thread_id:
@@ -62,9 +54,6 @@ async def cmd_ban_user(message: Message, bot: Bot):
         await message.answer("❌ Не вдалося знайти користувача для блокування у базі даних.")
 
 
-# =====================================================================
-# 🔓 КОМАНДА /unban ID (РУЧНОЙ РАЗБАН В GENERAL)
-# =====================================================================
 @router.message(F.chat.id == ADMIN_GROUP_ID, Command("unban"))
 async def cmd_unban_user(message: Message, bot: Bot):
     from handlers.client import create_new_support_topic
@@ -112,9 +101,6 @@ async def cmd_unban_user(message: Message, bot: Bot):
         await message.answer("ℹ️ Цей користувач не знайдений у списку заблокованих.")
 
 
-# =====================================================================
-# ⚖️ ОБРАБОТКА КНОПОК АПЕЛЛЯЦИИ ИЗ ЧАТА GENERAL
-# =====================================================================
 @router.callback_query(F.data.startswith("admin_approve_unban:"))
 async def callback_admin_approve_unban(callback: CallbackQuery, bot: Bot):
     from handlers.client import create_new_support_topic
@@ -170,9 +156,6 @@ async def callback_admin_reject_unban(callback: CallbackQuery):
     await callback.answer("Апеляцію відхилено.")
 
 
-# =====================================================================
-# 💬 ХЕНДЛЕР ОТВЕТА МЕНЕДЖЕРА (СТРОГО В САМОМ КОНЦЕ И ИГНОРИРУЕТ КОМАНДЫ)
-# =====================================================================
 @router.message(F.chat.id == ADMIN_GROUP_ID, lambda msg: not msg.text or not msg.text.startswith("/"))
 async def handle_admin_reply(message: Message, bot: Bot):
     if not message.message_thread_id or message.from_user.is_bot:

@@ -1,5 +1,3 @@
-# language_str.py
-
 TEXTS = {
     "uk": {
         "welcome": "👋 Вітаємо! Будь ласка, оберіть мову для продовження:\n\n👋 Welcome! Please choose a language to proceed:",
